@@ -1,0 +1,82 @@
+extends layout
+
+block content
+  .container.mt-4
+    // Show success message if it exists
+    if success
+      div.alert.alert-success
+        p= success
+
+    // Show error message if it exists
+    if error
+      div.alert.alert-danger
+        p= error
+
+    // Check if user is authenticated
+    if user
+      h1 Welcome, #{user.username}
+      p
+        | Your current wallet balance: 
+        strong $#{wallet.balance}
+
+      // Add Funds Button
+      button.btn.btn-primary.btn-sm.m-2(data-toggle='modal', data-target='#addFundsModal') Add Funds
+
+      // Withdraw Funds Button
+      button.btn.btn-danger.btn-sm.m-2(data-toggle='modal', data-target='#withdrawFundsModal') Withdraw Funds
+    else
+      h1 Welcome to PayPal System
+      p Please log in to view your account and wallet.
+
+    .mt-4
+      h1 Send Money
+      form(method='POST', action='/send-money')
+        .form-group
+          label(for='recipient_email') Recipient Email
+          input.form-control(type='email', id='recipient_email', name='recipient_email', placeholder='Enter recipient email', required=true)
+        .form-group
+          label(for='amount') Amount
+          input.form-control(type='number', step='0.01', id='amount', name='amount', placeholder='Enter amount', required=true)
+        button.btn.btn-primary.mt-3(type='submit') Send Money
+
+    // Add Funds Modal
+    .modal.fade(id='addFundsModal', tabindex='-1', role='dialog', aria-labelledby='addFundsModalLabel', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5.modal-title(id='addFundsModalLabel') Add Funds
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') &times;
+          .modal-body
+            form(method='POST', action='/add-money')
+              .form-group
+                label(for='amount') Amount
+                input.form-control(type='number', id='amount', name='amount', placeholder='Enter amount', required=true)
+              button.btn.btn-success(type='submit') Add Funds
+
+    // Withdraw Funds Modal
+    .modal.fade(id='withdrawFundsModal', tabindex='-1', role='dialog', aria-labelledby='withdrawFundsModalLabel', aria-hidden='true')
+      .modal-dialog(role='document')
+        .modal-content
+          .modal-header
+            h5.modal-title(id='withdrawFundsModalLabel') Withdraw Funds
+            button.close(type='button', data-dismiss='modal', aria-label='Close')
+              span(aria-hidden='true') &times;
+          .modal-body
+            form(method='POST', action='/withdraw-money')
+              .form-group
+                label(for='withdraw_amount') Amount
+                input.form-control(type='number', id='withdraw_amount', name='withdraw_amount', placeholder='Enter amount to withdraw', required=true)
+
+              // Withdrawal Method
+              .form-group
+                label(for='withdraw_method') Withdrawal Method
+                select.form-control(id='withdraw_method', name='withdraw_method', required=true)
+                  option(value='') -- Select Method --
+                  option(value='bank_transfer') Bank Transfer
+                  option(value='mobile_wallet') Mobile Wallet
+                  option(value='paypal_transfer') PayPal Transfer
+                  option(value='crypto_wallet') Crypto Wallet
+                  option(value='cash_pickup') Cash Pickup
+
+              button.btn.btn-danger(type='submit') Withdraw Funds
